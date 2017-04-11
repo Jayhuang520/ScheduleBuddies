@@ -18,10 +18,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import android.content.Intent;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView info;
+    private TextView infoText;
     private LoginButton loginButton;
 
 
@@ -33,37 +35,33 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_main);
-        info = (TextView)findViewById(R.id.info);
+        infoText = (TextView) findViewById(R.id.info1);
         loginButton = (LoginButton)findViewById(R.id.login_button);
 
+        infoText.setText("All the code works up to the loginbutton register callback");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                info.setText("Login success");
+                infoText.setText("Login Success");
             }
 
             @Override
             public void onCancel() {
-                info.setText("Login attempt canceled.");
+                infoText.setText("Login attempt canceled.");
             }
 
-            @Override
-            public void onError(FacebookException e) {
-                info.setText("Login attempt failed.");
-            }
-        });
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onError(FacebookException error) {
+                infoText.setText("Login Attempt Failed");
             }
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 
 
     @Override
