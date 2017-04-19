@@ -16,6 +16,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.location.Location;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,6 +35,8 @@ import android.view.MenuItem;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+
+import org.json.JSONObject;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -155,9 +160,26 @@ public class MapsActivity extends AppCompatActivity
     // Set up the get events button
     public void setupFindEvents() {
         Button find_events = (Button) findViewById(R.id.event_button);
+        final TextView eventTest = (TextView)findViewById(R.id.event_test);
         find_events.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Code for getting the events goes here
+                GraphRequest request = GraphRequest.newMeRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback(){
+                            @Override
+                            public void onCompleted(
+                                    JSONObject object,
+                                    GraphResponse response) {
+                                // Application code
+                             //   object = (new JSONObject(response)).getJSONObject("");
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,link");
+                request.setParameters(parameters);
+                request.executeAsync();
+
             }
         });
 
