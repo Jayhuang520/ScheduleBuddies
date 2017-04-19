@@ -7,8 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.SubMenu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.location.Location;
@@ -24,38 +27,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -65,36 +41,41 @@ public class MapsActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = MapsActivity.class.getSimpleName();
-    private GoogleMap mMap;
-    private CameraPosition mCameraPosition;
+        private static final String TAG = MapsActivity.class.getSimpleName();
+        private GoogleMap mMap;
+        private CameraPosition mCameraPosition;
 
-    // The entry point to Google Play services, used by the Places API and Fused Location Provider.
-    private GoogleApiClient mGoogleApiClient;
+        // The entry point to Google Play services, used by the Places API and Fused Location Provider.
+        private GoogleApiClient mGoogleApiClient;
 
-    // A default location (Sydney, Australia) and default zoom to use when location permission is
-    // not granted.
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean mLocationPermissionGranted;
+        // A default location (Sydney, Australia) and default zoom to use when location permission is
+        // not granted.
+        private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+        private static final int DEFAULT_ZOOM = 15;
+        private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+        private boolean mLocationPermissionGranted;
 
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
-    private Location mLastKnownLocation;
+        // The geographical location where the device is currently located. That is, the last-known
+        // location retrieved by the Fused Location Provider.
+        private Location mLastKnownLocation;
 
-    // Keys for storing activity state.
-    private static final String KEY_CAMERA_POSITION = "camera_position";
-    private static final String KEY_LOCATION = "location";
+        // Keys for storing activity state.
+        private static final String KEY_CAMERA_POSITION = "camera_position";
+        private static final String KEY_LOCATION = "location";
 
-    // Used for selecting the current place.
-    private final int mMaxEntries = 5;
-    private String[] mLikelyPlaceNames = new String[mMaxEntries];
-    private String[] mLikelyPlaceAddresses = new String[mMaxEntries];
-    private String[] mLikelyPlaceAttributions = new String[mMaxEntries];
-    private LatLng[] mLikelyPlaceLatLngs = new LatLng[mMaxEntries];
+        // Used for selecting the current place.
+        private final int mMaxEntries = 5;
+        private String[] mLikelyPlaceNames = new String[mMaxEntries];
+        private String[] mLikelyPlaceAddresses = new String[mMaxEntries];
+        private String[] mLikelyPlaceAttributions = new String[mMaxEntries];
+        private LatLng[] mLikelyPlaceLatLngs = new LatLng[mMaxEntries];
 
-    private LatLng mLastKnownLocationLatLng;
+        private LatLng mLastKnownLocationLatLng;
+
+        Menu dropDown;
+        SubMenu subm;
+
+    // On create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +88,13 @@ public class MapsActivity extends AppCompatActivity
 
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps2);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
+        // Setup the find events button
+        setupFindEvents();
+
 
         // Build the Play services client for use by the Fused Location Provider and the Places API.
         // Use the addApi() method to request the Google Places API and the Fused Location Provider.
@@ -163,29 +151,52 @@ public class MapsActivity extends AppCompatActivity
         Log.d(TAG, "Play services connection suspended");
     }
 
-//    /**
-//     * Sets up the options menu.
-//     * @param menu The options menu.
-//     * @return Boolean.
-//     */
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.current_place_menu, menu);
-//        return true;
-//    }
-//
-//    /**
-//     * Handles a click on the menu option to get a place.
-//     * @param item The menu item to handle.
-//     * @return Boolean.
-//     */
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == R.id.option_get_place) {
-//            showCurrentPlace();
-//        }
-//        return true;
-//    }
+
+    // Set up the get events button
+    public void setupFindEvents() {
+        Button find_events = (Button) findViewById(R.id.event_button);
+        find_events.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code for getting the events goes here
+            }
+        });
+
+    }
+
+    /**
+     * Sets up the options menu.
+     * @param menu The options menu.
+     * @return Boolean.
+     */
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.dropDown = menu;
+
+        return true;
+    }
+
+    /**
+     * Handles a click on the menu option to get a place.
+     * @param item The menu item to handle.
+     * @return Boolean.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.saved_events:
+                //getSavedEvents();
+                return true;
+            case R.id.action_settings:
+                //open submenu
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     /**
      * Manipulates the map when it's available.

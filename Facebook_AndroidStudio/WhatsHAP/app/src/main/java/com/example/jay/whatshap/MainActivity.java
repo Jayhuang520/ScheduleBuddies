@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToEvents(){
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
-
+        finish();
     }
 
 
