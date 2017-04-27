@@ -38,6 +38,8 @@ import com.google.android.gms.location.places.Places;
 
 import org.json.JSONObject;
 
+import static com.example.jay.whatshap.R.id.event_test;
+
 /**
  * An activity that displays a map showing the place at the device's current location.
  */
@@ -172,7 +174,9 @@ public class MapsActivity extends AppCompatActivity
                                     JSONObject object,
                                     GraphResponse response) {
                                 // Application code
-                             //   object = (new JSONObject(response)).getJSONObject("");
+                                String greeting = "Hello world!";
+                                eventTest.setText(greeting);
+                                        //.getJSONObject("");
                             }
                         });
                 Bundle parameters = new Bundle();
