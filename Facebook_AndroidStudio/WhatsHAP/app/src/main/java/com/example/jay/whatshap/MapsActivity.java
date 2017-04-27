@@ -13,6 +13,9 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.location.Location;
 
@@ -36,7 +39,13 @@ import android.view.MenuItem;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -80,6 +89,10 @@ public class MapsActivity extends AppCompatActivity
         Menu dropDown;
         SubMenu subm;
 
+        JSONArray events = null;
+        ArrayList<HashMap<String, String>> eventList;
+        ListView disp_list;
+
     // On create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +113,8 @@ public class MapsActivity extends AppCompatActivity
         // Setup the find events button
         setupFindEvents();
 
+        eventList = new ArrayList<HashMap<String, String>>();
+        disp_list = (ListView) findViewById(R.id.show_events);
 
         // Build the Play services client for use by the Fused Location Provider and the Places API.
         // Use the addApi() method to request the Google Places API and the Fused Location Provider.
@@ -160,7 +175,7 @@ public class MapsActivity extends AppCompatActivity
     // Set up the get events button
     public void setupFindEvents() {
         Button find_events = (Button) findViewById(R.id.event_button);
-        final TextView eventTest = (TextView)findViewById(R.id.event_test);
+        //final TextView eventTest = (TextView)findViewById(R.id.event_test);
         find_events.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Code for getting the events goes here
@@ -172,7 +187,35 @@ public class MapsActivity extends AppCompatActivity
                                     JSONObject object,
                                     GraphResponse response) {
                                 // Application code
-                             //   object = (new JSONObject(response)).getJSONObject("");
+                                try {
+                                    events = object.getJSONArray("id");
+
+                                    for(int i=0;i<events.length();i++){
+                                        JSONObject c = events.getJSONObject(i);
+                                        String id = c.getString("id");
+                                        String name = c.getString("name");
+                                        String link = c.getString("link");
+
+                                        HashMap<String,String> disp_events = new HashMap<String,String>();
+
+                                        disp_events.put("id",id);
+                                        disp_events.put("name",name);
+                                        disp_events.put("link",link);
+
+                                        eventList.add(disp_events);
+                                    }
+                                    ListAdapter adapter = null;
+                                    adapter = new SimpleAdapter(
+                                            MapsActivity.this, eventList, R.layout.event_list,
+                                            new String[]{"id","name","link"},
+                                            new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_link}
+                                    );
+                                    disp_list.setAdapter(adapter);
+
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+
                             }
                         });
                 Bundle parameters = new Bundle();

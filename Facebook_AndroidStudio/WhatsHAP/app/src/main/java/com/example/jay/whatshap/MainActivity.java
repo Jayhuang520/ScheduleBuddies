@@ -9,8 +9,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -37,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         infoText = (TextView) findViewById(R.id.info1);
         loginButton = (LoginButton)findViewById(R.id.login_button);
+
+        // TODO add condition if already logged in.
+
 
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
