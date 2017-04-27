@@ -43,9 +43,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+=======
+import static com.example.jay.whatshap.R.id.event_test;
+>>>>>>> 898bf80361b8427cbeec5fc9caacbf9386fa0131
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -187,6 +191,7 @@ public class MapsActivity extends AppCompatActivity
                                     JSONObject object,
                                     GraphResponse response) {
                                 // Application code
+
                                 try {
                                     events = object.getJSONArray("id");
 
@@ -215,7 +220,6 @@ public class MapsActivity extends AppCompatActivity
                                 }catch (JSONException e){
                                     e.printStackTrace();
                                 }
-
                             }
                         });
                 Bundle parameters = new Bundle();
