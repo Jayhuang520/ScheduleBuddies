@@ -43,13 +43,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-=======
-import static com.example.jay.whatshap.R.id.event_test;
->>>>>>> 898bf80361b8427cbeec5fc9caacbf9386fa0131
+
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -179,7 +176,6 @@ public class MapsActivity extends AppCompatActivity
     // Set up the get events button
     public void setupFindEvents() {
         Button find_events = (Button) findViewById(R.id.event_button);
-        //final TextView eventTest = (TextView)findViewById(R.id.event_test);
         find_events.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Code for getting the events goes here
@@ -193,7 +189,15 @@ public class MapsActivity extends AppCompatActivity
                                 // Application code
 
                                 try {
-                                    events = object.getJSONArray("id");
+                                    String res = object.toString();
+                                    StringBuilder new_res = new StringBuilder(res.length()+15);
+                                    new_res.append("{\"result\":[");
+                                    new_res.append(res);
+                                    new_res.append("]}");
+                                    String RES = new_res.toString();
+
+                                    JSONObject jsonObj = new JSONObject(RES);
+                                    events = jsonObj.getJSONArray("result");
 
                                     for(int i=0;i<events.length();i++){
                                         JSONObject c = events.getJSONObject(i);
