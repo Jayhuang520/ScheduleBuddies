@@ -203,21 +203,21 @@ public class MapsActivity extends AppCompatActivity
                                         JSONObject c = events.getJSONObject(i);
                                         String id = c.getString("id");
                                         String name = c.getString("name");
-                                        String link = c.getString("link");
+                                        String Events = c.getString("events");
 
                                         HashMap<String,String> disp_events = new HashMap<String,String>();
 
                                         disp_events.put("id",id);
                                         disp_events.put("name",name);
-                                        disp_events.put("link",link);
+                                        disp_events.put("events",Events);
 
                                         eventList.add(disp_events);
                                     }
                                     ListAdapter adapter = null;
                                     adapter = new SimpleAdapter(
                                             MapsActivity.this, eventList, R.layout.event_list,
-                                            new String[]{"id","name","link"},
-                                            new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_link}
+                                            new String[]{"id","name","events"},
+                                            new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
                                     );
                                     disp_list.setAdapter(adapter);
 
@@ -227,7 +227,7 @@ public class MapsActivity extends AppCompatActivity
                             }
                         });
                 Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,link");
+                parameters.putString("fields", "id,name,events");
                 request.setParameters(parameters);
                 request.executeAsync();
 
