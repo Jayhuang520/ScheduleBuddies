@@ -7,12 +7,21 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.SubMenu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.location.Location;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,38 +33,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -65,36 +56,45 @@ public class MapsActivity extends AppCompatActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = MapsActivity.class.getSimpleName();
-    private GoogleMap mMap;
-    private CameraPosition mCameraPosition;
+        private static final String TAG = MapsActivity.class.getSimpleName();
+        private GoogleMap mMap;
+        private CameraPosition mCameraPosition;
 
-    // The entry point to Google Play services, used by the Places API and Fused Location Provider.
-    private GoogleApiClient mGoogleApiClient;
+        // The entry point to Google Play services, used by the Places API and Fused Location Provider.
+        private GoogleApiClient mGoogleApiClient;
 
-    // A default location (Sydney, Australia) and default zoom to use when location permission is
-    // not granted.
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean mLocationPermissionGranted;
+        // A default location (Sydney, Australia) and default zoom to use when location permission is
+        // not granted.
+        private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+        private static final int DEFAULT_ZOOM = 15;
+        private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+        private boolean mLocationPermissionGranted;
 
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
-    private Location mLastKnownLocation;
+        // The geographical location where the device is currently located. That is, the last-known
+        // location retrieved by the Fused Location Provider.
+        private Location mLastKnownLocation;
 
-    // Keys for storing activity state.
-    private static final String KEY_CAMERA_POSITION = "camera_position";
-    private static final String KEY_LOCATION = "location";
+        // Keys for storing activity state.
+        private static final String KEY_CAMERA_POSITION = "camera_position";
+        private static final String KEY_LOCATION = "location";
 
-    // Used for selecting the current place.
-    private final int mMaxEntries = 5;
-    private String[] mLikelyPlaceNames = new String[mMaxEntries];
-    private String[] mLikelyPlaceAddresses = new String[mMaxEntries];
-    private String[] mLikelyPlaceAttributions = new String[mMaxEntries];
-    private LatLng[] mLikelyPlaceLatLngs = new LatLng[mMaxEntries];
+        // Used for selecting the current place.
+        private final int mMaxEntries = 5;
+        private String[] mLikelyPlaceNames = new String[mMaxEntries];
+        private String[] mLikelyPlaceAddresses = new String[mMaxEntries];
+        private String[] mLikelyPlaceAttributions = new String[mMaxEntries];
+        private LatLng[] mLikelyPlaceLatLngs = new LatLng[mMaxEntries];
 
-    private LatLng mLastKnownLocationLatLng;
+        private LatLng mLastKnownLocationLatLng;
+
+        Menu dropDown;
+        SubMenu subm;
+
+        JSONArray events = null;
+        ArrayList<HashMap<String, String>> eventList;
+        ListView disp_list;
+
+    // On create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +107,15 @@ public class MapsActivity extends AppCompatActivity
 
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps2);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
+        // Setup the find events button
+        setupFindEvents();
+
+        eventList = new ArrayList<HashMap<String, String>>();
+        disp_list = (ListView) findViewById(R.id.show_events);
 
         // Build the Play services client for use by the Fused Location Provider and the Places API.
         // Use the addApi() method to request the Google Places API and the Fused Location Provider.
@@ -163,29 +172,104 @@ public class MapsActivity extends AppCompatActivity
         Log.d(TAG, "Play services connection suspended");
     }
 
-//    /**
-//     * Sets up the options menu.
-//     * @param menu The options menu.
-//     * @return Boolean.
-//     */
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.current_place_menu, menu);
-//        return true;
-//    }
-//
-//    /**
-//     * Handles a click on the menu option to get a place.
-//     * @param item The menu item to handle.
-//     * @return Boolean.
-//     */
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == R.id.option_get_place) {
-//            showCurrentPlace();
-//        }
-//        return true;
-//    }
+
+    // Set up the get events button
+    public void setupFindEvents() {
+        Button find_events = (Button) findViewById(R.id.event_button);
+        find_events.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code for getting the events goes here
+                GraphRequest request = GraphRequest.newMeRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback(){
+                            @Override
+                            public void onCompleted(
+                                    JSONObject object,
+                                    GraphResponse response) {
+                                // Application code
+
+                                try {
+                                    String res = object.toString();
+                                    StringBuilder new_res = new StringBuilder(res.length()+15);
+                                    new_res.append("{\"result\":[");
+                                    new_res.append(res);
+                                    new_res.append("]}");
+                                    String RES = new_res.toString();
+
+                                    JSONObject jsonObj = new JSONObject(RES);
+                                    events = jsonObj.getJSONArray("result");
+
+                                    for(int i=0;i<events.length();i++){
+                                        JSONObject c = events.getJSONObject(i);
+                                        String id = c.getString("id");
+                                        String name = c.getString("name");
+                                        String Events = c.getString("events");
+
+                                        HashMap<String,String> disp_events = new HashMap<String,String>();
+
+                                        disp_events.put("id",id);
+                                        disp_events.put("name",name);
+                                        disp_events.put("events",Events);
+
+                                        eventList.add(disp_events);
+                                    }
+                                    ListAdapter adapter = null;
+                                    adapter = new SimpleAdapter(
+                                            MapsActivity.this, eventList, R.layout.event_list,
+                                            new String[]{"id","name","events"},
+                                            new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
+                                    );
+                                    disp_list.setAdapter(adapter);
+
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,events");
+                request.setParameters(parameters);
+                request.executeAsync();
+
+            }
+        });
+
+    }
+
+    /**
+     * Sets up the options menu.
+     * @param menu The options menu.
+     * @return Boolean.
+     */
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.dropDown = menu;
+
+        return true;
+    }
+
+    /**
+     * Handles a click on the menu option to get a place.
+     * @param item The menu item to handle.
+     * @return Boolean.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.saved_events:
+                //getSavedEvents();
+                return true;
+            case R.id.action_settings:
+                //open submenu
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     /**
      * Manipulates the map when it's available.
