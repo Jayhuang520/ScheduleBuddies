@@ -91,7 +91,7 @@ public class MapsActivity extends AppCompatActivity
         SubMenu subm;
 
         JSONArray events = null;
-        ArrayList<HashMap<String, String>> eventList;
+        DBHandler eventList;
         ListView disp_list;
 
     // On create
@@ -114,7 +114,7 @@ public class MapsActivity extends AppCompatActivity
         // Setup the find events button
         setupFindEvents();
 
-        eventList = new ArrayList<HashMap<String, String>>();
+        eventList = new DBHandler(this);
         disp_list = (ListView) findViewById(R.id.show_events);
 
         // Build the Play services client for use by the Fused Location Provider and the Places API.
@@ -201,21 +201,16 @@ public class MapsActivity extends AppCompatActivity
 
                                     for(int i=0;i<events.length();i++){
                                         JSONObject c = events.getJSONObject(i);
+                                        System.out.println(c);
                                         String id = c.getString("id");
                                         String name = c.getString("name");
                                         String Events = c.getString("events");
 
-                                        HashMap<String,String> disp_events = new HashMap<String,String>();
-
-                                        disp_events.put("id",id);
-                                        disp_events.put("name",name);
-                                        disp_events.put("events",Events);
-
-                                        eventList.add(disp_events);
+                                        eventList.addEvent(new Event(id, name, Events));
                                     }
                                     ListAdapter adapter = null;
                                     adapter = new SimpleAdapter(
-                                            MapsActivity.this, eventList, R.layout.event_list,
+                                            MapsActivity.this, eventList.getAllEvents(), R.layout.event_list,
                                             new String[]{"id","name","events"},
                                             new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
                                     );
