@@ -305,6 +305,8 @@ public class MapsActivity extends AppCompatActivity
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+        // Set markers for events
+        setEventMarkers();
     }
 
     /**
@@ -347,7 +349,7 @@ public class MapsActivity extends AppCompatActivity
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
         mLastKnownLocationLatLng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().title("Current Location").position(mLastKnownLocationLatLng));
+        mMap.addMarker(new MarkerOptions().title("You are here.").position(mLastKnownLocationLatLng));
     }
 
     /**
@@ -370,6 +372,43 @@ public class MapsActivity extends AppCompatActivity
         updateLocationUI();
     }
 
+    /**
+     * Updates the map's UI settings based on whether the user has granted location permission.
+     */
+    private void updateLocationUI() {
+        if (mMap == null) {
+            return;
+        }
+
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+
+        if (mLocationPermissionGranted) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        } else {
+            mMap.setMyLocationEnabled(false);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+            mLastKnownLocation = null;
+        }
+    }
+
+    private void setEventMarkers(){
+        LatLng eventLocation = new LatLng(39.997723, -105.25179);
+        mMap.addMarker(new MarkerOptions().title("Event Title").position(eventLocation).snippet("Event Description"));
+    }
     /**
      * Prompts the user to select the current place from a list of likely places, and shows the
      * current place on the map - provided the user has granted location permission.
@@ -458,36 +497,4 @@ public class MapsActivity extends AppCompatActivity
 //                .show();
 //    }
 
-    /**
-     * Updates the map's UI settings based on whether the user has granted location permission.
-     */
-    private void updateLocationUI() {
-        if (mMap == null) {
-            return;
-        }
-
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-
-        if (mLocationPermissionGranted) {
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        } else {
-            mMap.setMyLocationEnabled(false);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-            mLastKnownLocation = null;
-        }
-    }
 }
