@@ -90,6 +90,8 @@ public class MapsActivity extends AppCompatActivity
         Menu dropDown;
         SubMenu subm;
 
+        ArrayList<HashMap<String, String>> eventInfo ;
+
         JSONArray events = null;
         DBHandler eventList;
         ListView disp_list;
@@ -116,6 +118,7 @@ public class MapsActivity extends AppCompatActivity
 
         eventList = new DBHandler(this);
         disp_list = (ListView) findViewById(R.id.show_events);
+        eventInfo = new ArrayList<HashMap<String, String>>();
 
         // Build the Play services client for use by the Fused Location Provider and the Places API.
         // Use the addApi() method to request the Google Places API and the Fused Location Provider.
@@ -206,12 +209,44 @@ public class MapsActivity extends AppCompatActivity
                                         String name = c.getString("name");
                                         String Events = c.getString("events");
 
-                                        eventList.addEvent(new Event(id, name, Events));
+                                        try {
+                                            JSONObject data = new JSONObject(Events);
+                                            JSONArray events = data.getJSONArray("data");
+
+                                            for(int k = 0; k<events.length(); k++){
+                                                JSONObject e = events.getJSONObject(k);
+                                                String description = e.getString("description");
+                                                String end_time = e.getString("end_time");
+                                                String ev_name = e.getString("name");
+                                                String place = e.getString("place");
+                                                String start_time = e.getString("start_time");
+                                                String ev_id = e.getString("id");
+                                                String rsvp_status = e.getString("rsvp_status");
+
+
+                                                JSONObject place_info = new JSONObject(place);
+                                                JSONObject location = place_info.getJSONObject("location");
+                                                String longitude = location.getString("longitude");
+                                                String latitude = location.getString("latitude");
+
+                                                HashMap<String,String> ev = new HashMap<String,String>();
+                                                ev.put("name", ev_name);
+                                                ev.put("longitude", longitude);
+                                                ev.put("latitude", latitude);
+
+                                                eventInfo.add(ev);
+
+                                                eventList.addEvent(new Event(ev_name, longitude, latitude));
+                                            }
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                     ListAdapter adapter = null;
                                     adapter = new SimpleAdapter(
-                                            MapsActivity.this, eventList.getAllEvents(), R.layout.event_list,
-                                            new String[]{"id","name","events"},
+                                            MapsActivity.this, eventInfo, R.layout.event_list,
+                                            new String[]{"name","longitude","latitude"},
                                             new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
                                     );
                                     disp_list.setAdapter(adapter);
