@@ -229,14 +229,14 @@ public class MapsActivity extends AppCompatActivity
                                                 String longitude = location.getString("longitude");
                                                 String latitude = location.getString("latitude");
 
-                                                HashMap<String,String> ev = new HashMap<String,String>();
-                                                ev.put("name", ev_name);
-                                                ev.put("longitude", longitude);
-                                                ev.put("latitude", latitude);
+//                                                HashMap<String,String> ev = new HashMap<String,String>();
+//                                                ev.put("name", ev_name);
+//                                                ev.put("longitude", longitude);
+//                                                ev.put("latitude", latitude);
+//
+//                                                eventInfo.add(ev);
 
-                                                eventInfo.add(ev);
-
-                                                eventList.addEvent(new Event(ev_name, longitude, latitude));
+                                                eventList.addEvent(new Event(ev_id, ev_name, place, longitude, latitude, description, start_time, end_time, rsvp_status));
                                             }
 
                                         } catch (JSONException e) {
@@ -245,7 +245,7 @@ public class MapsActivity extends AppCompatActivity
                                     }
                                     ListAdapter adapter = null;
                                     adapter = new SimpleAdapter(
-                                            MapsActivity.this, eventInfo, R.layout.event_list,
+                                            MapsActivity.this, eventList.getAllEvents(), R.layout.event_list,
                                             new String[]{"name","longitude","latitude"},
                                             new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
                                     );

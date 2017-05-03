@@ -16,25 +16,20 @@ import java.util.HashMap;
 
 public class DBHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "eventsInfo";
-    private static final String TABLE_EVENTS = "events";
-    private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_SH_ADDR = "event_address";
 
-    public DBHandler(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
+    public DBHandler(Context context) { super(context, "eventsInfo", null, DATABASE_VERSION); }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
-        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-        + KEY_SH_ADDR + " TEXT" + ")";
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + "events" + "("
+        + "id" + " TEXT," + "name" + " TEXT," + "place" + " TEXT" + "longitude" + " TEXT" +
+                "latitude" + " TEXT" + "description" + " TEXT" + "start_time" + " TEXT" +
+                "end_time" + " TEXT" + "rsvp_status" + " TEXT" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + "events");
         onCreate(db);
     }
 
@@ -42,40 +37,55 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, event.getName());
-        values.put(KEY_SH_ADDR, event.getEvents());
+        values.put("id",event.getId());
+        values.put("name",event.getName());
+        values.put("place",event.getPlace());
+        values.put("longitude",event.getLongitude());
+        values.put("latitude",event.getLatitude());
+        values.put("description",event.getDescription());
+        values.put("start_time",event.getStart_time());
+        values.put("end_time",event.getEnd_time());
+        values.put("rsvp_status",event.getRsvp_status());
 
-        db.insert(TABLE_EVENTS, null, values);
+        db.insert("events", null, values);
         db.close();
     }
 
     public Event getEvent(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_EVENTS, new String[]{KEY_ID,
-                KEY_NAME, KEY_SH_ADDR}, KEY_ID + "=?",
+        Cursor cursor = db.query("events", new String[]{"id",
+                "name", "place", "longitude", "latitude", "description", "start_time", "end_time", "rspv_status"}, "id" + "=?",
         new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
 
         Event contact = new Event(cursor.getString(0),
-                cursor.getString(1), cursor.getString(2));
+                cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8));
         return contact;
     }
 
     public ArrayList<HashMap<String, String>> getAllEvents() {
         ArrayList<HashMap<String, String>> eventList = new ArrayList<HashMap<String, String>>();
-        String selectQuery = "SELECT * FROM " + TABLE_EVENTS;
+        String selectQuery = "SELECT * FROM " + "events";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
+
+                //HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
                 HashMap<String, String> event = new HashMap<String, String>();
                 event.put("id",cursor.getString(0));
                 event.put("name",cursor.getString(1));
-                event.put("events",cursor.getString(2));
+                event.put("place",cursor.getString(2));
+                event.put("longitude",cursor.getString(3));
+                event.put("latitude",cursor.getString(4));
+                event.put("description",cursor.getString(5));
+                event.put("start_time",cursor.getString(6));
+                event.put("end_time",cursor.getString(7));
+                event.put("rsvp_status",cursor.getString(8));
                 eventList.add(event);
             } while (cursor.moveToNext());
         }
@@ -84,7 +94,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     public int getEventsCount() {
-        String countQuery = "SELECT * FROM " + TABLE_EVENTS;
+        String countQuery = "SELECT * FROM " + "events";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
@@ -95,18 +105,25 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, event.getName());
-        values.put(KEY_SH_ADDR, event.getEvents());
+        values.put("id",event.getId());
+        values.put("name",event.getName());
+        values.put("place",event.getPlace());
+        values.put("longitude",event.getLongitude());
+        values.put("latitude",event.getLatitude());
+        values.put("description",event.getDescription());
+        values.put("start_time",event.getStart_time());
+        values.put("end_time",event.getEnd_time());
+        values.put("rsvp_status",event.getRsvp_status());
 
 // updating row
-        return db.update(TABLE_EVENTS, values, KEY_ID + " = ?",
+        return db.update("events", values, "id" + " = ?",
         new String[]{String.valueOf(event.getId())});
     }
 
     // Deleting a event
     public void deleteEvent(Event event) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_EVENTS, KEY_ID + " = ?",
+        db.delete("events", "id" + " = ?",
         new String[] { String.valueOf(event.getId()) });
         db.close();
     }
