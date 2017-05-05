@@ -216,6 +216,7 @@ public class MapsActivity extends AppCompatActivity
                                             for(int k = 0; k<events.length(); k++){
                                                 JSONObject e = events.getJSONObject(k);
                                                 String description = e.getString("description");
+                                                //System.out.println(e.getString("name") +"THIS IS A TEST" + e);
                                                 String end_time = e.getString("end_time");
                                                 String ev_name = e.getString("name");
                                                 String place = e.getString("place");
@@ -235,7 +236,6 @@ public class MapsActivity extends AppCompatActivity
 //                                                ev.put("latitude", latitude);
 //
 //                                                eventInfo.add(ev);
-
                                                 eventList.addEvent(new Event(ev_id, ev_name, place, longitude, latitude, description, start_time, end_time, rsvp_status));
                                             }
 
@@ -245,12 +245,12 @@ public class MapsActivity extends AppCompatActivity
                                     }
                                     ListAdapter adapter = null;
                                     adapter = new SimpleAdapter(
-                                            MapsActivity.this, eventList.getAllEvents(), R.layout.event_list,
-                                            new String[]{"name","longitude","latitude"},
+                                            MapsActivity.this, eventList.getAllEventsPartial(), R.layout.event_list,
+                                            new String[]{"name","place","start time"},
                                             new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
                                     );
                                     disp_list.setAdapter(adapter);
-
+                                    System.out.println(eventList.getAllEvents().size());
                                 }catch (JSONException e){
                                     e.printStackTrace();
                                 }
@@ -263,7 +263,6 @@ public class MapsActivity extends AppCompatActivity
 
             }
         });
-
     }
 
     /**
