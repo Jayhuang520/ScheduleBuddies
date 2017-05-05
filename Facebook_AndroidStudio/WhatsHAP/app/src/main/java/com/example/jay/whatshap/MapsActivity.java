@@ -233,6 +233,7 @@ public class MapsActivity extends AppCompatActivity
                                                 JSONObject location = place_info.getJSONObject("location");
                                                 //JSONObject long_map = location.getJSONObject("longitude");
                                                 //JSONObject lat_map = location.getJSONObject("latitude");
+                                                String place_name = place_info.getString("name");
                                                 String longitude = location.getString("longitude");
                                                 String latitude = location.getString("latitude");
                                                 Double long_map = Double.parseDouble(longitude);
@@ -244,12 +245,12 @@ public class MapsActivity extends AppCompatActivity
                                                 mMap.addMarker(new MarkerOptions().title(ev_name).position(eventLocation).snippet("Event Time:"+ start_time + " to " + end_time + "\n"+ rsvp_status));
 
 
-//                                                HashMap<String,String> ev = new HashMap<String,String>();
-//                                                ev.put("name", ev_name);
-//                                                ev.put("place", place);
-//                                                ev.put("start_time", start_time);
-//
-//                                                eventInfo.add(ev);
+                                                HashMap<String,String> ev = new HashMap<String,String>();
+                                                ev.put("name", ev_name);
+                                                ev.put("place", place_name);
+                                                ev.put("start_time", start_time);
+
+                                                eventInfo.add(ev);
                                                 eventList.addEvent(new Event(ev_id, ev_name, place, longitude, latitude, description, start_time, end_time, rsvp_status));
                                             }
 
@@ -259,8 +260,8 @@ public class MapsActivity extends AppCompatActivity
                                     }
                                     ListAdapter adapter = null;
                                     adapter = new SimpleAdapter(
-                                            MapsActivity.this, eventList.getAllEventsPartial(), R.layout.event_list,
-                                            new String[]{"name","place","start time"},
+                                            MapsActivity.this, eventInfo, R.layout.event_list,
+                                            new String[]{"name","place","start_time"},
                                             new int[]{R.id.disp_id, R.id.disp_name, R.id.disp_events}
                                     );
                                     disp_list.setAdapter(adapter);
