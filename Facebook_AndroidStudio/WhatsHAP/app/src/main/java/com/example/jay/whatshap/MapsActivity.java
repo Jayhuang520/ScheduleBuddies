@@ -246,8 +246,8 @@ public class MapsActivity extends AppCompatActivity
 
 //                                                HashMap<String,String> ev = new HashMap<String,String>();
 //                                                ev.put("name", ev_name);
-//                                                ev.put("longitude", longitude);
-//                                                ev.put("latitude", latitude);
+//                                                ev.put("place", place);
+//                                                ev.put("start_time", start_time);
 //
 //                                                eventInfo.add(ev);
                                                 eventList.addEvent(new Event(ev_id, ev_name, place, longitude, latitude, description, start_time, end_time, rsvp_status));
@@ -288,7 +288,7 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_facebook_logout, menu);
         this.dropDown = menu;
 
         return true;
@@ -302,12 +302,11 @@ public class MapsActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.saved_events:
-                //getSavedEvents();
+            case R.id.facebook_logout:
+                Intent intent =  new Intent(MapsActivity.this, MainActivity.class);
+                startActivity(intent);
                 return true;
-            case R.id.action_settings:
-                //open submenu
-                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
