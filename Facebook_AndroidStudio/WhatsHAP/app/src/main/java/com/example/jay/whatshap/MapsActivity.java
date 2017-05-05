@@ -1,5 +1,6 @@
 package com.example.jay.whatshap;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListAdapter;
@@ -213,6 +215,8 @@ public class MapsActivity extends AppCompatActivity
                                             JSONObject data = new JSONObject(Events);
                                             JSONArray events = data.getJSONArray("data");
 
+                                            LatLng eventLocation;
+
                                             for(int k = 0; k<events.length(); k++){
                                                 JSONObject e = events.getJSONObject(k);
                                                 String description = e.getString("description");
@@ -226,8 +230,17 @@ public class MapsActivity extends AppCompatActivity
 
                                                 JSONObject place_info = new JSONObject(place);
                                                 JSONObject location = place_info.getJSONObject("location");
+                                                //JSONObject long_map = location.getJSONObject("longitude");
+                                                //JSONObject lat_map = location.getJSONObject("latitude");
                                                 String longitude = location.getString("longitude");
                                                 String latitude = location.getString("latitude");
+                                                Double long_map = Double.parseDouble(longitude);
+                                                Double lat_map = Double.parseDouble(latitude);
+                                                //Double long_dub = long_map.getDouble("longitude");
+                                                //Double lat_dub = lat_map.getDouble("latitude");
+
+                                                eventLocation = new LatLng(lat_map, long_map);
+                                                mMap.addMarker(new MarkerOptions().title(ev_name).position(eventLocation).snippet("Event Time:"+ start_time + " to " + end_time + "\n"+ rsvp_status));
 
                                                 HashMap<String,String> ev = new HashMap<String,String>();
                                                 ev.put("name", ev_name);
@@ -235,6 +248,8 @@ public class MapsActivity extends AppCompatActivity
                                                 ev.put("latitude", latitude);
 
                                                 eventInfo.add(ev);
+
+                                                //Doulble lon = longitude.
 
                                                 eventList.addEvent(new Event(ev_name, longitude, latitude));
                                             }
@@ -266,13 +281,12 @@ public class MapsActivity extends AppCompatActivity
 
     }
 
+
     /**
      * Sets up the options menu.
      * @param menu The options menu.
      * @return Boolean.
      */
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -341,7 +355,7 @@ public class MapsActivity extends AppCompatActivity
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
         // Set markers for events
-        setEventMarkers();
+        //setEventMarkers();
     }
 
     /**
@@ -440,10 +454,11 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+    /*
     private void setEventMarkers(){
-        LatLng eventLocation = new LatLng(39.997723, -105.25179);
-        mMap.addMarker(new MarkerOptions().title("Event Title").position(eventLocation).snippet("Event Description"));
+
     }
+    */
     /**
      * Prompts the user to select the current place from a list of likely places, and shows the
      * current place on the map - provided the user has granted location permission.
