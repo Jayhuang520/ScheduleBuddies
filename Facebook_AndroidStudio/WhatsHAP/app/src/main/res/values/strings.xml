@@ -6,4 +6,5 @@
     <string name="facebook_logout">Logout of Facebook</string>
     <string name="saved_events">Saved Events</string>
     <string name="events">Events</string>
+    <string name="title_activity_list_view">ListView</string>
 </resources>

@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
+import android.app.ListActivity;
 /**
  * An activity that displays a map showing the place at the device's current location.
  */
@@ -237,8 +237,6 @@ public class MapsActivity extends AppCompatActivity
                                                 String latitude = location.getString("latitude");
                                                 Double long_map = Double.parseDouble(longitude);
                                                 Double lat_map = Double.parseDouble(latitude);
-                                                //Double long_dub = long_map.getDouble("longitude");
-                                                //Double lat_dub = lat_map.getDouble("latitude");
 
                                                 eventLocation = new LatLng(lat_map, long_map);
                                                 mMap.addMarker(new MarkerOptions().title(ev_name).position(eventLocation).snippet("Event Time:"+ start_time + " to " + end_time + "\n"+ rsvp_status));
@@ -278,7 +276,6 @@ public class MapsActivity extends AppCompatActivity
             }
         });
     }
-
 
     /**
      * Sets up the options menu.

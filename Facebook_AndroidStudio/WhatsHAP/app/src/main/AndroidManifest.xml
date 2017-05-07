@@ -52,9 +52,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.jay.whatshap.MainActivity" />
         </activity>
-        <activity
-            android:name=".StartActivity">
-        </activity>
+        <activity android:name=".StartActivity"></activity>
     </application>
 
 </manifest>
