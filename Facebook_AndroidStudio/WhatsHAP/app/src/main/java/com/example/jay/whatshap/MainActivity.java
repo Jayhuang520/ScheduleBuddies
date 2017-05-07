@@ -36,9 +36,6 @@ public class MainActivity extends AppCompatActivity {
         infoText = (TextView) findViewById(R.id.info1);
         loginButton = (LoginButton)findViewById(R.id.login_button);
 
-        // TODO add condition if already logged in.
-
-
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override

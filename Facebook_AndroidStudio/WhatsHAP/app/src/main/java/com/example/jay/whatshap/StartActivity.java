@@ -20,14 +20,16 @@ public class StartActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Intent mapIntent = new Intent(StartActivity.this, MapsActivity.class);
-                Intent loginIntent = new Intent(StartActivity.this, MapsActivity.class);
+                Intent loginIntent = new Intent(StartActivity.this, MainActivity.class);
 
                 AccessToken accessToken = AccessToken.getCurrentAccessToken();
                 if(accessToken != null){
                     StartActivity.this.startActivity(mapIntent);
+                    finish();
                 }
                 else{
                     StartActivity.this.startActivity(loginIntent);
+                    finish();
                 }
             }
         }, DISPLAY_LENGTH);

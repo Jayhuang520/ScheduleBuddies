@@ -6,8 +6,4 @@
         android:id="@+id/facebook_logout"
         android:orderInCategory="100"
         android:title="@string/facebook_logout"/>
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"/>
 </menu>
